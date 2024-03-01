@@ -1,0 +1,127 @@
+#!/bin/bash 
+# create a bash script named cyber_breaches to let user input file name and command
+
+
+# Check if the number of arguments is equal to 2
+if [[ $# -ne 2 ]]; then
+
+    # If not, print error message
+    1>&2 echo " Not correct number of input: $0 <file name> <command or valid input>"
+    
+    # exit the script correctly
+    exit 1
+
+# end of the conditional statement
+fi
+
+# Check if the file is an ordinal file and does not empty
+if [[ ! -f $1 ]] || [[ ! -s $1 ]]; then
+
+    # Print an error message
+    1>&2 echo "File not found or File is empty, please check your file: $1"
+
+    # Exit the script with indicate an error
+    exit 1
+
+# end of the conditional statement
+fi
+
+
+# set the first argument in the valuable as file so make the name of $1 clear
+file=$1
+
+# set the second argument in the valuable "Cmd" as file so make the name of $2 clear
+Cmd=$2
+
+# Use case statement to handle 5 different inputs
+case "$Cmd" in
+
+    # check the second argument is either "maxyear" or "maxstate"
+    maxstate | maxyear)
+
+
+        # execute the second argument as a command, and pass the first argument as file to that command
+        ./$Cmd $file
+
+        # end of the first case 
+        ;;
+
+    # check the input is fit for four digit number (year number)
+    [0-9][0-9][0-9][0-9])
+
+    # Using if statement to check weather the input four-digit number matches the year column in the csv file
+    if ! grep -q $Cmd <(cut -f8 $file) ;then
+
+            # echo the error message
+            1>&2 echo "no four digit number found in year: ${Cmd}"
+
+            # Exit with the error condition
+            exit 1
+
+        # exit the anit-buging check in if statement 
+        fi
+
+        # using grep to search for specific lines in the file which contains the four digit number input in the second argument.
+        # count the inncident for each state in the assigned years
+        # sort: sort the state allphebatically
+        # uniq -c: count the number of accident in each state
+        # sort: re-arrange the list by count
+        # tail: take the larget state
+        # assign the result in the valuable "stateNu"
+        stateNu=$(grep -w "$Cmd" "$file" | cut -f2 | sort | uniq -c | sort | tail -n1)
+
+        # read: use read to seperate the count number and the statename from the output of yearNu
+        # assigned these two outputs to two different valuables, nU and State
+        read Nu State <<< "$stateNu"
+
+        # print the output string including the input year, the count number and the state
+        echo "Year with greatest number of incidents for $Cmd is in $State with count $Nu"
+        
+        # end of the second case
+        ;;
+
+    # input two capital letters of "state name"    
+    [A-Z][A-Z])
+
+        # Using if statement to anti-bugging check whether the input state name matches the name in the state column in file
+        if ! grep -q $Cmd <(cut -f2 $file) ;then
+
+            # echo the error message if the two word letter can not find in the column
+            1>&2 echo "no matching name in the state column: $Cmd"
+            
+            # Exit with the error condition
+            exit 1
+         
+        # exit the anti-bugging in if statement
+        fi
+
+        # using grep to search for specific lines in the file which contains the two letters input in the "Cmd".
+        # count the inncident for each year in the input state and assign in the valuable
+        # sort: sort the years from small to big
+        # uniq -c: count the number of accident in each year
+        # sort: re-arrange the list by count
+        # tail: take the larget number of the year
+        yearNu=$(grep -w "$Cmd" "$file" | cut -f8 | sort | uniq -c | sort | tail -n1)
+
+        # read: use read to seperate the count number and the year number from the output of yearNu
+        # assigned these two outputs to two different valuables, nU and yeaR
+        read nU yeaR <<< "$yearNu"
+        
+        # print the output string including the input statename, the count, 0number and the year
+        echo "Year with greatest number of incidents for $Cmd is in $yeaR with count $nU"
+        
+        # exit the fourth case
+        ;;
+
+    # consider the situation whether it does not fit any of the scenario above    
+    *)
+    
+        # print an error message
+        echo "The max commands are either maxstate or maxyear"
+
+        # exit the script with no error
+        exit 0
+
+#end the case statement    
+esac
+    

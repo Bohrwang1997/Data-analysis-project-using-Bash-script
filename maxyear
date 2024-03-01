@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Report the year with the greatest number of incidences across all the states
+
+# count the inncident for each year
+# sort: sort the years from small to big
+# uniq -c: count the number of accident in each year
+# sort: re-arrange the list by count
+# tail: take the larget number of the year
+yearnumber=$(cut -f8 $1 | sort | uniq -c | sort | tail -n1)
+
+# read: use read to seperate the count number and the year number from the output of yearnumber
+# assign two seperate outputs into two different variables number year
+read number year <<< ${yearnumber}
+
+
+# print the output string with the count number and the year
+echo "Year with greatest number of incidents is: $year with count $number"

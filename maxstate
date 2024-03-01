@@ -1,0 +1,17 @@
+#!/bin/bash
+#report the state that has the largest number of incidents across all years
+
+# count the inncident for each state
+# sort: sort the state allphebatically
+# uniq -c: count the number of accident in each state
+# sort: re-arrange the list by count 
+# tail: take the larget state
+statenumber=$(cut -f2 $1 | sort | uniq -c | sort | tail -n1)
+
+# read: use read to seperate the count number and the relating state from the output of statebynver
+# assign two seperated outputs into two valuables number and state
+read number state <<< ${statenumber}
+
+# print the output string with the count number and the state
+echo "State with greatest number of incidents is: $state with count $number"
+
